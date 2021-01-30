@@ -44,7 +44,7 @@ public class UserMealsUtil {
                         dateTimeOfMeal,
                         userMeal.getDescription(),
                         userMeal.getCalories(),
-                        sumCaloriesPerDay.getOrDefault(dateTimeOfMeal.toLocalDate(), 0) > caloriesPerDay)
+                        sumCaloriesPerDay.get(dateTimeOfMeal.toLocalDate()) > caloriesPerDay)
                 );
             }
         }
@@ -71,18 +71,17 @@ public class UserMealsUtil {
                         userMeal -> userMeal.getDateTime().toLocalDate(),
                         Collectors.mapping(Function.identity(), Collectors.toList())))
                 .entrySet().stream()
-                .collect(Collectors.partitioningBy(entry -> entry.getValue().stream().reduce(caloriesPerDay, (a, b) -> a -= b.getCalories(), (a, b) -> b) < 0))
+                .collect(Collectors.partitioningBy(entry -> entry.getValue().stream().reduce(caloriesPerDay, (a, b) -> a - b.getCalories(), (a, b) -> a) < 0))
                 .entrySet().stream()
-                .flatMap((Map.Entry<Boolean, List<Map.Entry<LocalDate, List<UserMeal>>>> entry) -> entry.getValue().stream()
-                        .flatMap(innerEntry -> entry.getValue().stream().collect(Collectors.toMap(key -> entry.getKey(), value -> innerEntry.getValue())).entrySet().stream())
-                )
-                .flatMap(list -> list.getValue().stream()
+                .flatMap(entry -> entry.getValue().stream()
+                        .flatMap(innerEntry -> entry.getValue().stream().collect(Collectors.toMap(key -> entry.getKey(), value -> innerEntry.getValue())).entrySet().stream()))
+                .flatMap(map -> map.getValue().stream()
                         .filter(userMeal -> TimeUtil.isBetweenHalfOpen(userMeal.getDateTime().toLocalTime(), startTime, endTime))
-                        .map((UserMeal userMeal) -> new UserMealWithExcess(
+                        .map(userMeal -> new UserMealWithExcess(
                                 userMeal.getDateTime(),
                                 userMeal.getDescription(),
                                 userMeal.getCalories(),
-                                list.getKey()))
+                                map.getKey()))
                 ).collect(Collectors.toList());
     }
 }
