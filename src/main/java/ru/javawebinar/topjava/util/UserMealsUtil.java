@@ -10,6 +10,7 @@ import java.time.Month;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class UserMealsUtil {
     public static void main(String[] args) {
@@ -71,10 +72,14 @@ public class UserMealsUtil {
                         userMeal -> userMeal.getDateTime().toLocalDate(),
                         Collectors.mapping(Function.identity(), Collectors.toList())))
                 .entrySet().stream()
-                .collect(Collectors.partitioningBy(entry -> entry.getValue().stream().reduce(caloriesPerDay, (a, b) -> a - b.getCalories(), (a, b) -> a) < 0))
+                .collect(Collectors.partitioningBy(entry -> entry.getValue().stream().map(UserMeal::getCalories).reduce(caloriesPerDay, (a, b) -> a - b) < 0))
                 .entrySet().stream()
                 .flatMap(entry -> entry.getValue().stream()
-                        .flatMap(innerEntry -> entry.getValue().stream().collect(Collectors.toMap(key -> entry.getKey(), value -> innerEntry.getValue())).entrySet().stream()))
+                        .collect(Collectors.toMap(
+                                key -> entry.getKey(),
+                                Map.Entry::getValue,
+                                (listStart, listOther) -> Stream.of(listStart, listOther).flatMap(Collection::stream).collect(Collectors.toList()))
+                        ).entrySet().stream())
                 .flatMap(map -> map.getValue().stream()
                         .filter(userMeal -> TimeUtil.isBetweenHalfOpen(userMeal.getDateTime().toLocalTime(), startTime, endTime))
                         .map(userMeal -> new UserMealWithExcess(
