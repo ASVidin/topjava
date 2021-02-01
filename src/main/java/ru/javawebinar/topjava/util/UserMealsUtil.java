@@ -75,18 +75,16 @@ public class UserMealsUtil {
                 .collect(Collectors.partitioningBy(entry -> entry.getValue().stream().map(UserMeal::getCalories).reduce(caloriesPerDay, (a, b) -> a - b) < 0))
                 .entrySet().stream()
                 .flatMap(entry -> entry.getValue().stream()
-                        .collect(Collectors.toMap(
-                                key -> entry.getKey(),
-                                Map.Entry::getValue,
-                                (listStart, listOther) -> Stream.of(listStart, listOther).flatMap(Collection::stream).collect(Collectors.toList()))
-                        ).entrySet().stream())
-                .flatMap(map -> map.getValue().stream()
-                        .filter(userMeal -> TimeUtil.isBetweenHalfOpen(userMeal.getDateTime().toLocalTime(), startTime, endTime))
-                        .map(userMeal -> new UserMealWithExcess(
-                                userMeal.getDateTime(),
-                                userMeal.getDescription(),
-                                userMeal.getCalories(),
-                                map.getKey()))
-                ).collect(Collectors.toList());
+                                .flatMap(map -> map.getValue().stream()
+                                        .filter(userMeal -> TimeUtil.isBetweenHalfOpen(userMeal.getDateTime().toLocalTime(), startTime, endTime))
+                                        .map(userMeal -> new UserMealWithExcess(
+                                                userMeal.getDateTime(),
+                                                userMeal.getDescription(),
+                                                userMeal.getCalories(),
+                                                entry.getKey())
+                                        )
+                                )
+                )
+                .collect(Collectors.toList());
     }
 }
