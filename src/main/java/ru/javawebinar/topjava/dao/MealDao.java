@@ -4,10 +4,10 @@ import ru.javawebinar.topjava.model.Meal;
 
 import java.util.List;
 
-public class MealDao {
-    private static DataSource data = DataSource.getInstance();
-
-    public static List<Meal> getAll() {
-        return data.getMeals();
-    }
+public interface MealDao {
+    List<Meal> getAll();
+    Meal getMealById(long id);
+    void delete(long id);
+    Meal create(Meal meal);
+    Meal update(Meal meal);
 }

@@ -7,9 +7,8 @@
     <style>
         table {
             border-collapse: collapse;
-            width: 500px;
+            width: max-content;
         }
-
         th, td {
             border: 1px solid cadetblue;
             text-align: center;
@@ -26,11 +25,13 @@
 <h3><a href="index.html">Home</a></h3>
 <hr>
 <h2>Meals</h2>
+<p><a href="?action=insert">Add Meal</a></p>
 <table>
     <tr style="background-color: cadetblue">
         <th>Date</th>
         <th>Description</th>
         <th>Calories</th>
+        <th colspan=2>Action</th>
     </tr>
     <jsp:useBean id="list" scope="request" type="java.util.List"/>
     <c:forEach var="objMealTo" items="${list}">
@@ -38,6 +39,8 @@
             <td><javatime:format value="${objMealTo.dateTime}" pattern="yyyy-MM-dd HH:mm"/></td>
             <td>${objMealTo.description}</td>
             <td>${objMealTo.calories}</td>
+            <td><a href="?action=edit&mealId=${objMealTo.id}">Update</a></td>
+            <td><a href="?action=delete&mealId=${objMealTo.id}">Delete</a></td>
         </tr>
     </c:forEach>
 </table>
