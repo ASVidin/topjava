@@ -7,49 +7,56 @@ import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.service.MealService;
 import ru.javawebinar.topjava.to.MealTo;
 import ru.javawebinar.topjava.util.MealsUtil;
-import ru.javawebinar.topjava.web.SecurityUtil;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
 import static ru.javawebinar.topjava.util.ValidationUtil.assureIdConsistent;
 import static ru.javawebinar.topjava.util.ValidationUtil.checkNew;
+import static ru.javawebinar.topjava.web.SecurityUtil.*;
 
 @Controller
 public class MealRestController {
     protected final Logger log = LoggerFactory.getLogger(getClass());
-
     private final MealService service;
 
     public MealRestController(MealService service) {
         this.service = service;
     }
 
-    public List<MealTo> getAll(int userId) {
-        log.info("getAll for userId={}", userId);
-        ArrayList<Meal> meals = new ArrayList<>(service.getAll(userId));
-        return MealsUtil.getTos(meals, SecurityUtil.authUserCaloriesPerDay());
+    public List<MealTo> getAll() {
+        log.debug("getAll for userId={}", authUserId());
+        List<Meal> meals = new ArrayList<>(service.getAll(authUserId()));
+        return MealsUtil.getTos(meals, authUserCaloriesPerDay());
     }
 
-    public Meal get(int id, int userId) {
-        log.info("get id={} for userId={}", id, userId);
-        return service.get(id, userId);
+    public List<MealTo> getAll(LocalDate startDate, LocalDate endDate, LocalTime startTime, LocalTime endTime) {
+        log.debug("getAll for userId={}", authUserId());
+        List<Meal> meals = new ArrayList<>(service.getAll(authUserId(), startDate, endDate, startTime, endTime));
+        return MealsUtil.getTos(meals, authUserCaloriesPerDay());
+    }
+
+    public Meal get(int id) {
+        log.debug("get id={} for userId={}", id, authUserId());
+        return service.get(id, authUserId());
     }
 
     public Meal create(Meal meal) {
-        log.info("create meal {} for userId={}", meal, meal.getUserId());
+        log.debug("create meal {} for userId={}", meal, authUserId());
         checkNew(meal);
-        return service.create(meal, meal.getUserId());
+        return service.create(meal, authUserId());
     }
 
-    public void delete(int id, int userId) {
-        log.info("delete id={} for userId={}", id, userId);
-        service.delete(id, userId);
+    public void delete(int id) {
+        log.debug("delete id={} for userId={}", id, authUserId());
+        service.delete(id, authUserId());
     }
 
-    public void update(Meal meal, int userId) {
-        log.info("update meal {} for userId={}", meal, userId);
-        assureIdConsistent(meal, meal.getId());
-        service.update(meal, userId);
+    public void update(Meal meal, int id) {
+        log.debug("update meal {} with id={} for userId={}", meal, id, authUserId());
+        assureIdConsistent(meal, id);
+        service.update(meal, authUserId());
     }
 }
