@@ -6,12 +6,13 @@
 <body>
 <h3>Проект <a href="https://github.com/JavaWebinar/topjava" target="_blank">Java Enterprise (Topjava)</a></h3>
 <hr>
-Choose user
+
 <form method="post" action="users">
-    <input type="radio" id="first" name="id" value="1">
-    <label for="first">1</label><br>
-    <input type="radio" id="second" name="id" value="2">
-    <label for="second">2</label><br>
+    <label for="users">Choose user</label><br>
+    <select id="users" name="id">
+        <option value="1">1</option>
+        <option value="2">2</option>
+    </select>
     <button type="submit">Save</button>
 </form>
 <ul>
