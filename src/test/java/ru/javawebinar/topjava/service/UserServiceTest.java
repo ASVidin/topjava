@@ -20,7 +20,8 @@ import static org.junit.Assert.assertThrows;
 import static ru.javawebinar.topjava.UserTestData.*;
 
 @ContextConfiguration({
-        "classpath:spring/spring-app.xml",
+        "classpath:spring/main-repository.xml",
+        "classpath:spring/main-service.xml",
         "classpath:spring/spring-db.xml"
 })
 @RunWith(SpringRunner.class)

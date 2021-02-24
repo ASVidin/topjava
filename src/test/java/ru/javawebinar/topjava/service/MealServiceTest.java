@@ -9,8 +9,6 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.test.context.junit4.SpringRunner;
 import ru.javawebinar.topjava.model.Meal;
-import ru.javawebinar.topjava.util.DateTimeUtil;
-import ru.javawebinar.topjava.util.Util;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import java.time.LocalDate;
@@ -23,7 +21,8 @@ import static ru.javawebinar.topjava.MealTestData.*;
 import static ru.javawebinar.topjava.UserTestData.*;
 
 @ContextConfiguration({
-        "classpath:spring/spring-app.xml",
+        "classpath:spring/main-repository.xml",
+        "classpath:spring/main-service.xml",
         "classpath:spring/spring-db.xml"
 })
 @RunWith(SpringRunner.class)
@@ -36,14 +35,13 @@ public class MealServiceTest {
     @Test
     public void get() {
         Meal meal = service.get(MEAL_ID_2, USER_ID);
-        assertThat(meal).usingRecursiveComparison().isEqualTo(MEAL_2_USER);
+        assertMatch(meal, userMeal2);
     }
 
     @Test(expected = NotFoundException.class)
     public void getNotYourMeal() {
-        int admin_meal = MEAL_3_ADMIN.getId();
-        Meal meal = service.get(admin_meal, USER_ID);
-        assertThat(meal).usingRecursiveComparison().isEqualTo(MEAL_3_ADMIN);
+        int adminMeal = adminMeal3.getId();
+        service.get(adminMeal, USER_ID);
     }
 
     @Test(expected = NotFoundException.class)
@@ -59,8 +57,8 @@ public class MealServiceTest {
 
     @Test(expected = NotFoundException.class)
     public void deleteNotYourMeal() {
-        int admin_meal = MEAL_3_ADMIN.getId();
-        service.delete(admin_meal, USER_ID);
+        int adminMeal = adminMeal3.getId();
+        service.delete(adminMeal, USER_ID);
     }
 
     @Test(expected = NotFoundException.class)
@@ -72,22 +70,20 @@ public class MealServiceTest {
     public void getBetweenInclusive() {
         LocalDate sd = LocalDate.of(2021, Month.FEBRUARY, 10);
         List<Meal> actualList = service.getBetweenInclusive(sd, null, USER_ID);
-        List<Meal> expectedList = getListWithFilter(meal -> Util.isBetweenHalfOpen(
-                meal.getDateTime(), DateTimeUtil.atStartOfDayOrMin(sd), DateTimeUtil.atStartOfNextDayOrMax(null)), MEALS_OF_USER);
-        assertEqualsWhitSorted(actualList, expectedList);
+        assertEqualsWhitSorted(actualList, mealsOfUserWithFilter);
     }
 
     @Test
     public void getAll() {
         List<Meal> mealList = service.getAll(USER_ID);
-        assertEqualsWhitSorted(mealList, MEALS_OF_USER);
+        assertEqualsWhitSorted(mealList, mealsOfUser);
     }
 
     @Test
     public void update() {
         Meal updated = getUpdatedMeal();
         service.update(updated, USER_ID);
-        assertThat(service.get(MEAL_ID_2, USER_ID)).usingRecursiveComparison().isEqualTo(getUpdatedMeal());
+        assertMatch(service.get(MEAL_ID_2, USER_ID), getUpdatedMeal());
     }
 
     @Test(expected = NotFoundException.class)
@@ -106,7 +102,6 @@ public class MealServiceTest {
     public void updateDuplicateDateTime() {
         Meal updated = getDuplicateUpdated();
         service.update(updated, USER_ID);
-        assertThat(service.get(MEAL_ID_2, USER_ID)).usingRecursiveComparison().isEqualTo(getDuplicateUpdated());
     }
 
     @Test
@@ -115,7 +110,8 @@ public class MealServiceTest {
         Meal newMeal = getNewMeal();
         Integer id = created.getId();
         newMeal.setId(id);
-        assertThat(created).usingRecursiveComparison().isEqualTo(newMeal);
+        assertMatch(created, newMeal);
+        assertMatch(created, newMeal);
         assertThat(service.get(id, USER_ID)).usingRecursiveComparison().isEqualTo(newMeal);
     }
 }
