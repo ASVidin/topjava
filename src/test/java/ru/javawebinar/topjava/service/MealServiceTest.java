@@ -21,8 +21,8 @@ import static ru.javawebinar.topjava.MealTestData.*;
 import static ru.javawebinar.topjava.UserTestData.*;
 
 @ContextConfiguration({
-        "classpath:spring/main-repository.xml",
-        "classpath:spring/main-service.xml",
+        "classpath:spring/jdbc-repository.xml",
+        "classpath:spring/spring-app.xml",
         "classpath:spring/spring-db.xml"
 })
 @RunWith(SpringRunner.class)
@@ -110,7 +110,6 @@ public class MealServiceTest {
         Meal newMeal = getNewMeal();
         Integer id = created.getId();
         newMeal.setId(id);
-        assertMatch(created, newMeal);
         assertMatch(created, newMeal);
         assertThat(service.get(id, USER_ID)).usingRecursiveComparison().isEqualTo(newMeal);
     }
