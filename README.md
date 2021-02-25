@@ -1,5 +1,5 @@
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/b4ac2ee319624d41bb90d89269a16265)](https://www.codacy.com/gh/ASVidin/topjava/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ASVidin/topjava&amp;utm_campaign=Badge_Grade)
-[![Build Status](https://api.travis-ci.com/JavaWebinar/topjava.svg?branch=master)](https://travis-ci.com/JavaWebinar/topjava)
+[![Build Status](https://travis-ci.com/ASVidin/topjava.svg?branch=master)](https://travis-ci.com/ASVidin/topjava)
 
 Java Enterprise Online Project 
 ===============================
