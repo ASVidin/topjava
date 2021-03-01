@@ -1,8 +1,9 @@
 package ru.javawebinar.topjava.model;
 
-import jakarta.validation.constraints.NotBlank;
+import org.hibernate.validator.constraints.Range;
 
 import javax.persistence.*;
+import javax.validation.constraints.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -25,19 +26,22 @@ public class Meal extends AbstractBaseEntity {
     public static final String ALL_WITH_FILTER = "Meal.getAllWithFilters";
 
     @Column(name = "date_time", nullable = false)
-    @NotBlank
+    @NotNull
     private LocalDateTime dateTime;
 
     @Column(name = "description", nullable = false)
     @NotBlank
+    @Size(min = 2, max = 120)
     private String description;
 
     @Column(name = "calories", nullable = false)
-    @NotBlank
+    @NotNull
+    @Range(min = 10, max = 5000)
     private int calories;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @NotNull
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     public Meal() {
